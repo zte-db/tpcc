@@ -1,44 +1,14 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------
-# Copyright (C) 2011
-# Andy Pavlo
-# http://www.cs.brown.edu/~pavlo/
-#
-# Original Java Version:
-# Copyright (C) 2008
-# Evan Jones
-# Massachusetts Institute of Technology
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
-# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
-# -----------------------------------------------------------------------
-
 from __future__ import with_statement
 
 import os
 import sqlite3
 import logging
-import commands
+# import commands
+import subprocess
 from pprint import pprint,pformat
 
 import constants
-from abstractdriver import *
+from drivers.abstractdriver import *
 
 TXN_QUERIES = {
     "DELIVERY": {
@@ -127,15 +97,15 @@ class SqliteDriver(AbstractDriver):
         
         self.database = str(config["database"])
         
-        if config["reset"] and os.path.exists(self.database):
-            logging.debug("Deleting database '%s'" % self.database)
-            os.unlink(self.database)
+        # if config["reset"] and os.path.exists(self.database):
+        #     logging.debug("Deleting database '%s'" % self.database)
+        #     os.unlink(self.database)
         
         if os.path.exists(self.database) == False:
             logging.debug("Loading DDL file '%s'" % (self.ddl))
             ## HACK
             cmd = "sqlite3 %s < %s" % (self.database, self.ddl)
-            (result, output) = commands.getstatusoutput(cmd)
+            (result, output) = subprocess.getstatusoutput(cmd)
             assert result == 0, cmd + "\n" + output
         ## IF
             
@@ -360,7 +330,7 @@ class SqliteDriver(AbstractDriver):
             assert len(all_customers) > 0
             namecnt = len(all_customers)
             index = (namecnt-1)/2
-            customer = all_customers[index]
+            customer = all_customers[int(index)]
             c_id = customer[0]
         assert len(customer) > 0
         assert c_id != None
@@ -400,7 +370,7 @@ class SqliteDriver(AbstractDriver):
             all_customers = self.cursor.fetchall()
             assert len(all_customers) > 0
             namecnt = len(all_customers)
-            index = (namecnt-1)/2
+            index = int((namecnt-1)/2)
             customer = all_customers[index]
             c_id = customer[0]
         assert len(customer) > 0

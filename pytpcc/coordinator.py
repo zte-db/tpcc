@@ -38,7 +38,7 @@ import pickle
 import execnet
 import worker
 import message
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 from pprint import pprint,pformat
 
 from util import *

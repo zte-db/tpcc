@@ -1,36 +1,5 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------
-# Copyright (C) 2011
-# Andy Pavlo
-# http://www.cs.brown.edu/~pavlo/
-#
-# Original Java Version:
-# Copyright (C) 2008
-# Evan Jones
-# Massachusetts Institute of Technology
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
-# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
-# -----------------------------------------------------------------------
-
 import random
-import nurand
+import os
 
 SYLLABLES = [ "BAR", "OUGHT", "ABLE", "PRI", "PRES", "ESE", "ANTI", "CALLY", "ATION", "EING" ]
 
@@ -45,7 +14,7 @@ def NURand(a, x, y):
     global nurandVar
     assert x <= y
     if nurandVar is None:
-		setNURand(nurand.makeForLoad())
+	    setNURand(makeForLoad())
     
     if a == 255:
         c = nurandVar.cLast
@@ -95,7 +64,7 @@ def fixedPoint(decimal_places, minimum, maximum):
 
 def selectUniqueIds(numUnique, minimum, maximum):
     rows = set()
-    for i in range(0, numUnique):
+    for i in range(0, int(numUnique)):
         index = None
         while index == None or index in rows:
             index = number(minimum, maximum)
@@ -130,7 +99,7 @@ def makeLastName(number):
     global SYLLABLES
     assert 0 <= number and number <= 999
     indicies = [ number/100, (number/10)%10, number%10 ]
-    return "".join(map(lambda x: SYLLABLES[x], indicies))
+    return "".join(map(lambda x: SYLLABLES[int(x)], indicies))
 ## DEF
 
 def makeRandomLastName(maxCID):
@@ -139,3 +108,35 @@ def makeRandomLastName(maxCID):
     if (maxCID - 1) < min_cid: min_cid = maxCID - 1
     return makeLastName(NURand(255, 0, min_cid))
 ## DEF
+
+
+
+
+def makeForLoad():
+    """Create random NURand constants, appropriate for loading the database."""
+    cLast = number(0, 255)
+    cId = number(0, 1023)
+    orderLineItemId = number(0, 8191)
+    return NURandC(cLast, cId, orderLineItemId)
+
+def validCRun(cRun, cLoad):
+    """Returns true if the cRun value is valid for running. See TPC-C 2.1.6.1 (page 20)"""
+    cDelta = abs(cRun - cLoad)
+    return 65 <= cDelta and cDelta <= 119 and cDelta != 96 and cDelta != 112
+
+def makeForRun(loadC):
+    """Create random NURand constants for running TPC-C. TPC-C 2.1.6.1. (page 20) specifies the valid range for these constants."""
+    cRun = number(0, 255)
+    while validCRun(cRun, loadC.cLast) == False:
+        cRun = number(0, 255)
+    assert validCRun(cRun, loadC.cLast)
+    
+    cId = number(0, 1023)
+    orderLineItemId = number(0, 8191)
+    return NURandC(cRun, cId, orderLineItemId)
+
+class NURandC:
+    def __init__(self, cLast, cId, orderLineItemId):
+        self.cLast = cLast
+        self.cId = cId
+        self.orderLineItemId = orderLineItemId

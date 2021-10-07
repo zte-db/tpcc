@@ -1,34 +1,3 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------
-# Copyright (C) 2011
-# Andy Pavlo
-# http://www.cs.brown.edu/~pavlo/
-#
-# Original Java Version:
-# Copyright (C) 2008
-# Evan Jones
-# Massachusetts Institute of Technology
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
-# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
-# -----------------------------------------------------------------------
-
 MONEY_DECIMALS = 2
 
 #  Item constants
@@ -91,7 +60,7 @@ BAD_CREDIT = "BC"
 MIN_CARRIER_ID = 1
 MAX_CARRIER_ID = 10
 #  HACK: This is not strictly correct, but it works
-NULL_CARRIER_ID = 0L
+NULL_CARRIER_ID = 0
 #  o_id < than this value, carrier != null, >= -> carrier == null
 NULL_CARRIER_LOWER_BOUND = 2101
 MIN_OL_CNT = 5
@@ -156,6 +125,8 @@ def enum(*sequential, **named):
     enums = dict(map(lambda x: (x, x), sequential))
     # dict(zip(sequential, range(len(sequential))), **named)
     return type('Enum', (), enums)
+
+
 TransactionTypes = enum(
     "DELIVERY",
     "NEW_ORDER",
