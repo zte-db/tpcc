@@ -40,7 +40,8 @@ class Executor:
                 if debug: traceback.print_exc(file=sys.stdout)
                 if self.stop_on_error: raise
                 r.abortTransaction(txn_id)
-                continue
+                return -1
+                #continue
 
             #if debug: logging.debug("%s\nParameters:\n%s\nResult:\n%s" % (txn, pformat(params), pformat(val)))
             

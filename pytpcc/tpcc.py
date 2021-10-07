@@ -14,7 +14,7 @@ from pprint import pprint,pformat
 from util import *
 from runtime import *
 import drivers
-
+import constants
 import os
 import sys
 
@@ -170,7 +170,7 @@ if __name__ == '__main__':
                          help='Number of Warehouses')
     aparser.add_argument('--duration', default=60, type=int, metavar='D',
                          help='How long to run the benchmark in seconds')
-    aparser.add_argument('--ddl', default=os.path.realpath(os.path.join(os.path.dirname(__file__), "tpcc.sql")),
+    aparser.add_argument('--ddl', default=constants.ddl,
                          help='Path to the TPC-C DDL SQL file')
     aparser.add_argument('--clients', default=1, type=int, metavar='N',
                          help='The number of blocking clients to fork')
@@ -197,16 +197,13 @@ if __name__ == '__main__':
     assert driver != None, "Failed to create '%s' driver" % args['system']
 
 
-    if  True:
-        logging.debug("Using default configuration for %s" % args['system'])
-        defaultConfig = driver.makeDefaultConfig()
-        config = dict(map(lambda x: (x, defaultConfig[x][1]), defaultConfig.keys()))
+
+    config = dict(map(lambda x: (x, config.POSTGRESQL_CONFIG[x][1]), config.POSTGRESQL_CONFIG.keys()))
 
     config['reset'] = args['reset']
     config['load'] = False
     config['execute'] = False
 
-    print(config)
     if config['reset']: logging.info("Reseting database")
     driver.loadConfig(config)
     logging.info("Initializing TPC-C benchmark using %s" % driver)
@@ -231,7 +228,7 @@ if __name__ == '__main__':
         load_time = time.time() - load_start
     ## IF
     
-    ## WORKLOAD DRIVER!!!
+    # WORKLOAD DRIVER!!!
     if not args['no_execute']:
         if args['clients'] == 1:
             e = executor.Executor(driver, scaleParameters, stop_on_error=args['stop_on_error'])
@@ -242,6 +239,6 @@ if __name__ == '__main__':
             results = startExecution(driverClass, scaleParameters, args, config)
         assert results
         print(results.show(load_time))
-    ## IF
+    # IF
     
 ## MAIN

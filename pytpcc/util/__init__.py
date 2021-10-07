@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["scaleparameters", "rand",  "results"]
+__all__ = ["scaleparameters", "rand",  "results", "config"]

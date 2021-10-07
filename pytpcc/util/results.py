@@ -77,7 +77,7 @@ class Results:
         
         col_width = 16
         total_width = (col_width*4)+2
-        f = "\n  " + (("%-" + str(col_width) + "s")*4)
+        f = "\n  " + (("  %-" + str(col_width) + "s")*4)
         line = "-"*total_width
 
         ret = u"" + "="*total_width + "\n"
@@ -99,7 +99,8 @@ class Results:
             total_cnt += txn_cnt
         ret += "\n" + ("-"*total_width)
         total_rate = "%.02f txn/s" % ((total_cnt / total_time))
-        ret += f % ("TOTAL", str(total_cnt), str(total_time * 1000000), total_rate)
+        ret += f % ("TOTAL", str(total_cnt), " "+str(total_time * 1000000), " "+total_rate)
 
-        return (ret.encode('utf-8'))
+        return ret
+        #return (ret.encode('utf-8'))
 ## CLASS
