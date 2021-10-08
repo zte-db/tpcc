@@ -37,26 +37,26 @@ def getDrivers():
 ## ==============================================
 ## startLoading
 ## ==============================================
-def startLoading(driver, scaleParameters, args):
-    logging.info("Creating client pool with %d processes" % args['clients'])
-    pool = multiprocessing.Pool(args['clients'])
+def startLoading(driver, scaleParameters, config):
+    logging.info("Creating client pool with %d processes" % config['clients'])
+    pool = multiprocessing.Pool(config['clients'])
 
     
     # Split the warehouses into chunks
-    w_ids = map(lambda x: [ ], range(args['clients']))
+    w_ids = map(lambda x: [ ], range(config['clients']))
     for w_id in range(scaleParameters.starting_warehouse, scaleParameters.ending_warehouse+1):
-        idx = w_id % args['clients']
+        idx = w_id % config['clients']
         w_ids[idx].append(w_id)
     ## FOR
     
     loader_results = [ ]
-    for i in range(args['clients']):
+    for i in range(config['clients']):
         r = pool.apply_async(loaderFunc, (driver, scaleParameters,w_ids[i]))
         loader_results.append(r)
     ## FOR
     
     pool.close()
-    logging.info("Waiting for %d loaders to finish" % args['clients'])
+    logging.info("Waiting for %d loaders to finish" % config['clients'])
     pool.join()
 ## DEF
 
@@ -86,14 +86,13 @@ def loaderFunc(driver, scaleParameters, w_ids):
 ## ==============================================
 ## startExecution
 ## ==============================================
-def startExecution(driverClass, scaleParameters, args, config):
-    logging.debug("Creating client pool with %d processes" % args['clients'])
-    pool = multiprocessing.Pool(args['clients'])
-    debug = logging.getLogger().isEnabledFor(logging.DEBUG)
+def startExecution(driverClass, scaleParameters, config):
+    logging.info("Creating client pool with %d processes" % config['clients'])
+    pool = multiprocessing.Pool(config['clients'])
     
     worker_results = [ ]
-    for i in range(args['clients']):
-        r = pool.apply_async(executorFunc, (driverClass, scaleParameters, args, config, debug,))
+    for i in range(config['clients']):
+        r = pool.apply_async(executorFunc, (driverClass, scaleParameters, config))
         worker_results.append(r)
     ## FOR
     pool.close()
@@ -114,18 +113,14 @@ def startExecution(driverClass, scaleParameters, args, config):
 ## ==============================================
 ## executorFunc
 ## ==============================================
-def executorFunc(driverClass, scaleParameters, args, config, debug):
-    driver = driverClass(args['ddl'])
+def executorFunc(driverClass, scaleParameters, config):
+    driver = driverClass(config['ddl'])
     assert driver != None
-    logging.debug("Starting client execution: %s" % driver)
-    
-    config['execute'] = True
-    config['reset'] = False
-    driver.loadConfig(config)
+    logging.info("Starting client execution: %s" % driver)
 
-    e = executor.Executor(driver, scaleParameters, stop_on_error=args['stop_on_error'])
+    e = executor.Executor(driver, scaleParameters, stop_on_error=config['stop_on_error'])
     driver.executeStart()
-    results = e.execute(args['duration'])
+    results = e.execute(config['duration'])
     driver.executeFinish()
     
     return results
@@ -166,7 +161,7 @@ if __name__ == '__main__':
     config = dict(map(lambda x: (x, config.POSTGRESQL_CONFIG[x][1]), config.POSTGRESQL_CONFIG.keys()))
     for key,val in args.items():    config[key]=val
 
-
+    print(config)
     ## Create a handle to the target client driver
     driver = PostgresqlDriver(args['ddl'])
 
@@ -182,27 +177,27 @@ if __name__ == '__main__':
     if config['reset']:
         logging.info("Loading TPC-C benchmark data using %s" % (driver))
         load_start = time.time()
-        if args['clients'] == 1:
+        if config['clients'] == 1:
             l = loader.Loader(driver, scaleParameters, range(scaleParameters.starting_warehouse, scaleParameters.ending_warehouse+1), True)
             driver.loadStart()
             l.execute()
             driver.loadFinish()
         else:
-            startLoading(driver, scaleParameters, args)
+            startLoading(driver, scaleParameters, config)
         load_time = time.time() - load_start
     
-    
-    # # WORKLOAD DRIVER!!!
-    # if not args['no_execute']:
-    #     if args['clients'] == 1:
-    #         e = executor.Executor(driver, scaleParameters, stop_on_error=args['stop_on_error'])
-    #         driver.executeStart()
-    #         results = e.execute(args['duration'])
-    #         driver.executeFinish()
-    #     else:
-    #         results = startExecution(driver, scaleParameters, args, config)
-    #     assert results
-    #     print(results.show(load_time))
-    # # IF
+
+    # WORKLOAD DRIVER!!!
+    if not config['no_execute']:
+        if config['clients'] == 1:
+            e = executor.Executor(driver, scaleParameters, stop_on_error=config['stop_on_error'])
+            driver.executeStart()
+            results = e.execute(config['duration'])
+            driver.executeFinish()
+        else:
+            results = startExecution(driver, scaleParameters,config)
+        assert results
+        print(results.show(load_time))
+    # IF
     
 ## MAIN
