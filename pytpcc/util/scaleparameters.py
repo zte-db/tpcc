@@ -2,13 +2,6 @@
 
 import constants
 
-def makeDefault(warehouses):
-    return ScaleParameters(constants.NUM_ITEMS, \
-                           warehouses, \
-                           constants.DISTRICTS_PER_WAREHOUSE, \
-                           constants.CUSTOMERS_PER_DISTRICT, \
-                           constants.INITIAL_NEW_ORDERS_PER_DISTRICT)
-## DEF
 
 def makeWithScaleFactor(warehouses, scaleFactor):
     assert scaleFactor >= 1.0
