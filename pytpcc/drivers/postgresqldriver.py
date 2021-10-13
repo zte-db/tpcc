@@ -19,18 +19,20 @@ class PostgresqlDriver(AbstractDriver):
     ## ----------------------------------------------
     ## loadConfig
     ## ----------------------------------------------
-    def loadConfig(self, config):    
+    def InitDBHandler(self, config):    
         self.conn = psycopg2.connect(database=config["dbname"], user=config["user"], password=config["password"], host=config["host"], port=config["port"])
         self.cursor = self.conn.cursor()
 
-        if config["reset"]:
-            logging.info("Reseting database")
-            self.reset()
 
-            for sql in self.ddl:
-                self.cursor.execute(sql)
-            self.conn.commit()
-        logging.info("Reseting database successful!")
+    def remove_customer_index(self):
+        for sql in remove_customer_index_sql:
+            self.cursor.execute(sql)
+        self.conn.commit()
+
+    def recover_customer_index(self):
+        for sql in recover_customer_index_sql:
+            self.cursor.execute(sql)
+        self.conn.commit()
 
     ## ----------------------------------------------
     ## loadTuples
@@ -74,6 +76,12 @@ class PostgresqlDriver(AbstractDriver):
         self.cursor.execute("drop table if exists item cascade;")
         self.cursor.execute("drop table if exists stock cascade;")
         self.cursor.execute("drop table if exists warehouse cascade;")
+
+        for sql in self.ddl:
+            self.cursor.execute(sql)
+        self.conn.commit()
+        
+        logging.info("Reseting database successful!")
     ## ----------------------------------------------
     ## doDelivery
     ## ----------------------------------------------
