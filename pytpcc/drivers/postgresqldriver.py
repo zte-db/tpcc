@@ -9,6 +9,9 @@ from pprint import pprint,pformat
 import constants
 from drivers.abstractdriver import *
 from util.config import *
+import time
+from multiprocessing import Pool
+
 
 class PostgresqlDriver(AbstractDriver):
     def __init__(self, ddl):
@@ -19,20 +22,12 @@ class PostgresqlDriver(AbstractDriver):
     ## ----------------------------------------------
     ## loadConfig
     ## ----------------------------------------------
-    def InitDBHandler(self, config):    
+    def InitDBHandler(self, config):
+        self.config = config
         self.conn = psycopg2.connect(database=config["dbname"], user=config["user"], password=config["password"], host=config["host"], port=config["port"])
         self.cursor = self.conn.cursor()
 
 
-    def remove_customer_index(self):
-        for sql in remove_customer_index_sql:
-            self.cursor.execute(sql)
-        self.conn.commit()
-
-    def recover_customer_index(self):
-        for sql in recover_customer_index_sql:
-            self.cursor.execute(sql)
-        self.conn.commit()
 
     ## ----------------------------------------------
     ## loadTuples

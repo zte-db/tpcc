@@ -63,18 +63,6 @@ TXN_QUERIES = {
     },
 }
 
-remove_customer_index_sql=[
-    "ALTER TABLE customer DROP CONSTRAINT customer_pkey cascade;",
-    "drop index if exists idx_customer_name cascade;"
-]
-
-recover_customer_index_sql=[
-    "ALTER TABLE customer ADD CONSTRAINT customer_pkey PRIMARY KEY (c_w_id, c_d_id, c_id);",
-    "create index idx_customer_name on customer(c_w_id, c_d_id, c_last, c_first);",
-    "ALTER TABLE history  ADD CONSTRAINT fkey_history_1  FOREIGN KEY (h_c_w_id, h_c_d_id, h_c_id)  REFERENCES customer (c_w_id, c_d_id, c_id);",
-    "ALTER TABLE oorder  ADD CONSTRAINT fkey_order_1  FOREIGN KEY (o_w_id, o_d_id, o_c_id)  REFERENCES customer (c_w_id, c_d_id, c_id);"
-]
-
 
 ddl = [
     """CREATE TABLE WAREHOUSE (

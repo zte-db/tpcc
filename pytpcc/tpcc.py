@@ -133,7 +133,7 @@ if __name__ == '__main__':
                          help='Number of Warehouses')
     aparser.add_argument('--duration', default=60, type=int, metavar='D',
                          help='How long to run the benchmark in seconds')
-    aparser.add_argument('--clients', default=10, type=int, metavar='N',
+    aparser.add_argument('--clients', default=1, type=int, metavar='N',
                          help='The number of blocking clients to fork')
     aparser.add_argument('--stop-on-error', action='store_true',
                          help='Stop the transaction execution when the driver throws an exception.')
