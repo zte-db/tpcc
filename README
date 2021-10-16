@@ -8,3 +8,5 @@ python tpcc.py --reset --no-execute
 #tpcc
 python tpcc.py
 
+#执行自定义sql
+python main.py
