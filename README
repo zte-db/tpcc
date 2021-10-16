@@ -2,4 +2,9 @@
 + Python TPC-C                                    +
 + ----------------------------------------------- +
 
-python tpcc.py 
+#init DB
+python tpcc.py --reset --no-execute
+
+#tpcc
+python tpcc.py
+
